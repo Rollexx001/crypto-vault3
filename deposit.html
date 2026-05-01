@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - CryptoVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-secondary: #1e2329;
+            --bg-tertiary: #2b3139;
+            --bg-card: #181a20;
+            --accent-gold: #f0b90b;
+            --accent-green: #0ecb81;
+            --accent-red: #f6465d;
+            --accent-blue: #1e80ff;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --text-muted: #5e6673;
+            --border-color: #2b3139;
+            --glow-gold: rgba(240, 185, 11, 0.3);
+            --glow-green: rgba(14, 203, 129, 0.3);
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(240,185,11,0.03) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(240,185,11,0.03) 100%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -200px;
+            left: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(14,203,129,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-gold), #d4a00a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--bg-primary);
+            font-weight: 800;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-gold);
+            background: rgba(240, 185, 11, 0.1);
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== DEPOSIT METHODS GRID ===== */
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .method-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .method-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .method-card.featured {
+            border-color: var(--accent-gold);
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(240,185,11,0.08) 100%);
+            position: relative;
+        }
+
+        .method-card.featured::before {
+            content: 'RECOMMENDED';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 4px;
+        }
+
+        .method-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 16px;
+        }
+
+        .method-icon.gold { background: rgba(240, 185, 11, 0.15); }
+        .method-icon.green { background: rgba(14, 203, 129, 0.15); }
+        .method-icon.blue { background: rgba(30, 128, 255, 0.15); }
+        .method-icon.purple { background: rgba(147, 51, 234, 0.15); }
+        .method-icon.orange { background: rgba(245, 158, 11, 0.15); }
+        .method-icon.cyan { background: rgba(0, 212, 255, 0.15); }
+
+        .method-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .method-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .method-card .time {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            padding: 4px 10px;
+            background: rgba(14, 203, 129, 0.1);
+            border-radius: 4px;
+        }
+
+        /* ===== INFO CARDS ===== */
+        .info-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .info-card .icon {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .info-card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .info-card p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== SECURITY NOTICE ===== */
+        .security-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(30, 128, 255, 0.1);
+            border: 1px solid rgba(30, 128, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .security-notice .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .security-notice .content h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .security-notice .content p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== RESPONSIVE STYLES ===== */
+        @media (max-width: 1024px) {
+            .methods-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .navbar-right .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .main-container {
+                padding: 20px 16px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .page-header p {
+                font-size: 0.85rem;
+            }
+            
+            .methods-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .method-card {
+                padding: 20px;
+            }
+            
+            .method-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.4rem;
+                margin-bottom: 14px;
+            }
+            
+            .method-card h3 {
+                font-size: 1rem;
+            }
+            
+            .method-card p {
+                font-size: 0.8rem;
+            }
+            
+            .featured-badge {
+                top: 10px;
+                right: 10px;
+                padding: 4px 10px;
+                font-size: 0.65rem;
+            }
+            
+            .method-tag {
+                padding: 4px 10px;
+                font-size: 0.7rem;
+            }
+            
+            .info-section {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .info-card {
+                padding: 16px;
+            }
+            
+            .info-card h4 {
+                font-size: 0.9rem;
+            }
+            
+            .info-card p {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                height: 52px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+                gap: 8px;
+            }
+            
+            .logo-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-right .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .main-container {
+                padding: 16px 12px;
+            }
+            
+            .page-header {
+                margin-bottom: 24px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .method-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+            
+            .method-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 1.2rem;
+            }
+            
+            .info-card {
+                padding: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <a href="dashboard.html" class="logo">
+            <div class="logo-icon">₿</div>
+            CryptoVault
+        </a>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="deposit.html" class="nav-link active">Deposit</a>
+            <a href="withdrawal.html" class="nav-link">Withdraw</a>
+            <a href="#" class="nav-link">Markets</a>
+        </div>
+
+        <div class="navbar-right">
+            <a href="dashboard.html" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1>💳 Deposit Funds</h1>
+            <p>Choose your preferred deposit method and start investing</p>
+        </div>
+
+        <!-- Deposit Methods -->
+        <div class="methods-grid">
+            <a href="Crytocurrency.html" class="method-card featured">
+                <div class="method-icon gold">₿</div>
+                <h3>Cryptocurrency</h3>
+                <p>Deposit BTC, ETH, USDT and more directly from your wallet</p>
+                <span class="time">⚡ Instant - 30 min</span>
+            </a>
+
+            <div class="method-card" onclick="depositFunds('Bank Transfer')">
+                <div class="method-icon blue">🏦</div>
+                <h3>Bank Transfer</h3>
+                <p>Wire transfer from your bank account securely</p>
+                <span class="time">🕐 1-3 Business days</span>
+            </div>
+
+            <div class="method-card" onclick="depositFunds('Credit Card')">
+                <div class="method-icon green">💳</div>
+                <h3>Credit/Debit Card</h3>
+                <p>Instant deposit with Visa, Mastercard, or Amex</p>
+                <span class="time">⚡ Instant</span>
+            </div>
+
+            <div class="method-card" onclick="depositFunds('PayPal')">
+                <div class="method-icon cyan">🅿️</div>
+                <h3>PayPal</h3>
+                <p>Quick and secure PayPal transfer</p>
+                <span class="time">⚡ Instant</span>
+            </div>
+
+            <div class="method-card" onclick="depositFunds('Wire Transfer')">
+                <div class="method-icon purple">📨</div>
+                <h3>Wire Transfer</h3>
+                <p>International wire transfer for large amounts</p>
+                <span class="time">🕐 2-5 Business days</span>
+            </div>
+
+            <div class="method-card" onclick="depositFunds('Apple Pay')">
+                <div class="method-icon orange">🍎</div>
+                <h3>Apple/Google Pay</h3>
+                <p>Mobile wallet for quick deposits</p>
+                <span class="time">⚡ Instant</span>
+            </div>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="info-section">
+            <div class="info-card">
+                <div class="icon">🔒</div>
+                <h4>Bank-Level Security</h4>
+                <p>256-bit SSL encryption protects all transactions</p>
+            </div>
+            <div class="info-card">
+                <div class="icon">💰</div>
+                <h4>No Hidden Fees</h4>
+                <p>Transparent pricing with low transaction costs</p>
+            </div>
+            <div class="info-card">
+                <div class="icon">⚡</div>
+                <h4>Fast Processing</h4>
+                <p>Most deposits are processed instantly</p>
+            </div>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="security-notice">
+            <span class="icon">🛡️</span>
+            <div class="content">
+                <h4>Security Notice</h4>
+                <p>All deposits are protected with bank-level encryption. Your financial information is never stored on our servers. Minimum deposit amount is $10 USD or equivalent.</p>
+            </div>
+        </div>
+    </div>
+
+<script type="module" src="js/deposit.js"></script>
+</body>
+</html>

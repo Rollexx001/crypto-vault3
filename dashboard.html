@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CryptoVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-secondary: #1e2329;
+            --bg-tertiary: #2b3139;
+            --bg-card: #181a20;
+            --accent-gold: #f0b90b;
+            --accent-green: #0ecb81;
+            --accent-red: #f6465d;
+            --accent-blue: #1e80ff;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --text-muted: #5e6673;
+            --border-color: #2b3139;
+            --glow-gold: rgba(240, 185, 11, 0.3);
+            --glow-green: rgba(14, 203, 129, 0.3);
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(240,185,11,0.03) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(240,185,11,0.03) 100%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Glow orbs */
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(240,185,11,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== HEADER / NAVBAR ===== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-gold), #d4a00a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--bg-primary);
+            font-weight: 800;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-gold);
+            background: rgba(240, 185, 11, 0.1);
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 12px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .user-info:hover {
+            background: #363c46;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--bg-primary);
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-email {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #d4a00a;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .btn-danger:hover {
+            background: rgba(246, 70, 93, 0.1);
+        }
+
+        /* Dropdown Menu */
+        .menu-dropdown {
+            position: relative;
+        }
+
+        .menu-btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+            min-width: 220px;
+            overflow: hidden;
+            z-index: 1001;
+        }
+
+        .dropdown-content.show {
+            display: block;
+            animation: dropIn 0.2s ease-out;
+        }
+
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-gold);
+        }
+
+        .dropdown-item .icon {
+            font-size: 1.1rem;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px 0;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            padding: 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== WELCOME BANNER ===== */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #1a1d24 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: radial-gradient(ellipse at right, rgba(240,185,11,0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .welcome-content h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .welcome-content h1 span {
+            color: var(--accent-gold);
+        }
+
+        .welcome-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .welcome-actions {
+            display: flex;
+            gap: 12px;
+            z-index: 1;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .action-btn.deposit {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+        }
+
+        .action-btn.deposit:hover {
+            background: #d4a00a;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--glow-gold);
+        }
+
+        .action-btn.withdraw {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .action-btn.withdraw:hover {
+            border-color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* ===== PORTFOLIO STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-2px);
+        }
+
+        .stat-card.balance {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(240,185,11,0.05) 100%);
+            border-color: rgba(240,185,11,0.3);
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .stat-label .icon {
+            font-size: 1rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -1px;
+        }
+
+        .stat-card.balance .stat-value {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--accent-gold), #fcd535);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            background: rgba(14, 203, 129, 0.1);
+            color: var(--accent-green);
+        }
+
+        .stat-change.negative {
+            background: rgba(246, 70, 93, 0.1);
+            color: var(--accent-red);
+        }
+
+        /* ===== QUICK ACTIONS GRID ===== */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: block;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-gold);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-icon.gold { background: rgba(240, 185, 11, 0.15); }
+        .feature-icon.green { background: rgba(14, 203, 129, 0.15); }
+        .feature-icon.blue { background: rgba(30, 128, 255, 0.15); }
+        .feature-icon.purple { background: rgba(147, 51, 234, 0.15); }
+        .feature-icon.red { background: rgba(246, 70, 93, 0.15); }
+        .feature-icon.cyan { background: rgba(0, 212, 255, 0.15); }
+
+        .feature-card h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .feature-card .arrow {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        /* ===== MARKET OVERVIEW ===== */
+        .market-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .market-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .market-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .market-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .market-tab.active {
+            background: var(--bg-tertiary);
+            color: var(--accent-gold);
+        }
+
+        .market-tab:hover:not(.active) {
+            color: var(--text-primary);
+        }
+
+        .crypto-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .crypto-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            align-items: center;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .crypto-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .crypto-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .crypto-icon.btc { background: linear-gradient(135deg, #f7931a, #ff8c00); color: #fff; }
+        .crypto-icon.eth { background: linear-gradient(135deg, #627eea, #3c50b1); color: #fff; }
+        .crypto-icon.bnb { background: linear-gradient(135deg, #f0b90b, #d4a00a); color: #000; }
+        .crypto-icon.sol { background: linear-gradient(135deg, #9945ff, #14f195); color: #fff; }
+
+        .crypto-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .crypto-symbol {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .crypto-price, .crypto-volume {
+            font-weight: 500;
+            color: var(--text-primary);
+            text-align: right;
+        }
+
+        .crypto-change {
+            text-align: right;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .crypto-change.up {
+            color: var(--accent-green);
+            background: rgba(14, 203, 129, 0.1);
+        }
+
+        .crypto-change.down {
+            color: var(--accent-red);
+            background: rgba(246, 70, 93, 0.1);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 40px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .stat-card.balance {
+                grid-column: span 2;
+            }
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .menu-btn {
+                padding: 6px 10px;
+            }
+            
+            .btn.btn-danger {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .main-container {
+                padding: 20px 16px;
+            }
+            
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+                padding: 24px 20px;
+            }
+            
+            .welcome-content h1 {
+                font-size: 1.4rem;
+            }
+            
+            .welcome-content p {
+                font-size: 0.85rem;
+            }
+            
+            .welcome-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-card.balance {
+                grid-column: span 1;
+            }
+            
+            .stat-card.balance .stat-value {
+                font-size: 2rem;
+            }
+            
+            .stat-value {
+                font-size: 1.6rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .feature-card {
+                padding: 20px;
+            }
+            
+            .feature-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+                margin-bottom: 12px;
+            }
+            
+            .feature-card h3 {
+                font-size: 0.95rem;
+            }
+            
+            .feature-card p {
+                font-size: 0.8rem;
+            }
+            
+            .market-section {
+                padding: 20px 16px;
+            }
+            
+            .market-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .market-tabs {
+                width: 100%;
+                overflow-x: auto;
+            }
+            
+            .crypto-item {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+                padding: 12px;
+            }
+            
+            .crypto-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
+            }
+            
+            .crypto-name {
+                font-size: 0.9rem;
+            }
+            
+            .crypto-price {
+                font-size: 0.9rem;
+            }
+            
+            .crypto-volume {
+                display: none;
+            }
+            
+            .crypto-change {
+                font-size: 0.8rem;
+                padding: 3px 6px;
+            }
+            
+            .footer {
+                padding: 20px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .dropdown-content {
+                min-width: 180px;
+            }
+            
+            .dropdown-item {
+                padding: 12px 16px;
+                font-size: 0.85rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                height: 52px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+                gap: 8px;
+            }
+            
+            .logo-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.9rem;
+            }
+            
+            .main-container {
+                padding: 16px 12px;
+            }
+            
+            .welcome-banner {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+            
+            .welcome-content h1 {
+                font-size: 1.2rem;
+            }
+            
+            .stat-card {
+                padding: 16px;
+                border-radius: 10px;
+            }
+            
+            .stat-card.balance .stat-value {
+                font-size: 1.7rem;
+            }
+            
+            .stat-value {
+                font-size: 1.4rem;
+            }
+            
+            .feature-card {
+                padding: 16px;
+                border-radius: 10px;
+            }
+            
+            .crypto-item {
+                padding: 10px;
+            }
+            
+            .crypto-info {
+                gap: 8px;
+            }
+        }
+
+        /* Loading animation */
+        .stat-value.updating {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">
+            <div class="logo-icon">₿</div>
+            CryptoVault
+        </div>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-link active">Dashboard</a>
+            <a href="deposit.html" class="nav-link">Deposit</a>
+            <a href="withdrawal.html" class="nav-link">Withdraw</a>
+            <a href="#" class="nav-link">Markets</a>
+            <a href="#" class="nav-link">Trade</a>
+        </div>
+
+        <div class="navbar-right">
+            <div class="user-info">
+                <div class="user-avatar" id="userInitial">U</div>
+                <div class="user-details">
+                    <div class="user-name" id="userNameNav">User</div>
+                    <div class="user-email" id="userEmailNav">user@example.com</div>
+                </div>
+            </div>
+            
+            <div class="menu-dropdown">
+                <button class="menu-btn" onclick="toggleMenu()">☰</button>
+                <div class="dropdown-content" id="menuDropdown">
+                    <a class="dropdown-item" href="#profile"><span class="icon">👤</span> Profile</a>
+                    <a class="dropdown-item" href="deposit.html"><span class="icon">💳</span> Deposit</a>
+                    <a class="dropdown-item" href="withdrawal.html"><span class="icon">💸</span> Withdrawal</a>
+                    <a class="dropdown-item" href="#"><span class="icon">📊</span> Trade History</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#"><span class="icon">⚙️</span> Settings</a>
+                    <a class="dropdown-item" href="#"><span class="icon">🔐</span> Security</a>
+                    <a class="dropdown-item" href="#"><span class="icon">❓</span> Help Center</a>
+                </div>
+            </div>
+            
+            <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <!-- WELCOME BANNER -->
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <h1>Welcome back, <span id="userGreeting">User</span></h1>
+                <p>Monitor your portfolio and start trading with confidence</p>
+            </div>
+            <div class="welcome-actions">
+                <a href="deposit.html" class="action-btn deposit">
+                    <span>➕</span> Deposit
+                </a>
+                <a href="withdrawal.html" class="action-btn withdraw">
+                    <span>↗️</span> Withdraw
+                </a>
+            </div>
+        </div>
+
+        <!-- PORTFOLIO STATS -->
+        <div class="stats-grid">
+            <div class="stat-card balance">
+                <div class="stat-label">
+                    <span class="icon">💰</span>
+                    Total Balance
+                </div>
+                <div class="stat-value" id="userBalance">$0.00</div>
+                <div class="stat-change positive">
+                    <span>↑</span> +2.45% today
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="icon">📈</span>
+                    24h Change
+                </div>
+                <div class="stat-value" id="change24h">+0.00%</div>
+                <div class="stat-change positive">
+                    <span>↑</span> Trending up
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">
+                    <span class="icon">🔄</span>
+                    Transactions
+                </div>
+                <div class="stat-value" id="totalAssets">0</div>
+                <div class="stat-change positive">
+                    <span>✓</span> All verified
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <h2 class="section-title">⚡ Quick Actions</h2>
+        <div class="cards-grid">
+            <a href="deposit.html" class="feature-card">
+                <div class="feature-icon gold">💳</div>
+                <h3>Deposit Funds</h3>
+                <p>Add funds via bank transfer, card, or crypto wallet</p>
+                <div class="arrow">Get Started →</div>
+            </a>
+            
+            <a href="Crytocurrency.html" class="feature-card">
+                <div class="feature-icon green">₿</div>
+                <h3>Crypto Deposit</h3>
+                <p>Deposit Bitcoin, Ethereum, and other cryptocurrencies</p>
+                <div class="arrow">Transfer Now →</div>
+            </a>
+            
+            <a href="withdrawal.html" class="feature-card">
+                <div class="feature-icon blue">↗️</div>
+                <h3>Withdraw</h3>
+                <p>Securely withdraw to your wallet or bank account</p>
+                <div class="arrow">Withdraw →</div>
+            </a>
+            
+            <a href="#" class="feature-card">
+                <div class="feature-icon purple">📊</div>
+                <h3>Trade</h3>
+                <p>Buy and sell crypto with low fees</p>
+                <div class="arrow">Start Trading →</div>
+            </a>
+            
+            <a href="#" class="feature-card">
+                <div class="feature-icon cyan">🔐</div>
+                <h3>Security</h3>
+                <p>Manage 2FA and security settings</p>
+                <div class="arrow">Configure →</div>
+            </a>
+            
+            <a href="#" class="feature-card">
+                <div class="feature-icon red">📜</div>
+                <h3>History</h3>
+                <p>View all your transaction history</p>
+                <div class="arrow">View All →</div>
+            </a>
+        </div>
+
+        <!-- MARKET OVERVIEW -->
+        <div class="market-section">
+            <div class="market-header">
+                <h2 class="section-title" style="margin-bottom: 0;">📈 Market Overview</h2>
+                <div class="market-tabs">
+                    <button class="market-tab active">Trending</button>
+                    <button class="market-tab">Gainers</button>
+                    <button class="market-tab">New Listings</button>
+                </div>
+            </div>
+            
+            <div class="crypto-list">
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon btc">₿</div>
+                        <div>
+                            <div class="crypto-name">Bitcoin</div>
+                            <div class="crypto-symbol">BTC</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">$67,432.50</div>
+                    <div class="crypto-volume">$28.5B</div>
+                    <div class="crypto-change up">+2.34%</div>
+                </div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon eth">Ξ</div>
+                        <div>
+                            <div class="crypto-name">Ethereum</div>
+                            <div class="crypto-symbol">ETH</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">$3,456.78</div>
+                    <div class="crypto-volume">$14.2B</div>
+                    <div class="crypto-change up">+1.87%</div>
+                </div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon bnb">B</div>
+                        <div>
+                            <div class="crypto-name">BNB</div>
+                            <div class="crypto-symbol">BNB</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">$598.23</div>
+                    <div class="crypto-volume">$1.8B</div>
+                    <div class="crypto-change down">-0.54%</div>
+                </div>
+                
+                <div class="crypto-item">
+                    <div class="crypto-info">
+                        <div class="crypto-icon sol">◎</div>
+                        <div>
+                            <div class="crypto-name">Solana</div>
+                            <div class="crypto-symbol">SOL</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">$142.67</div>
+                    <div class="crypto-volume">$2.4B</div>
+                    <div class="crypto-change up">+5.21%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>© 2024 CryptoVault. All rights reserved. | Secure • Trusted • Professional</p>
+        </div>
+    </div>
+
+<script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

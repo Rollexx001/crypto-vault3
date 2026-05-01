@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw - CryptoVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-secondary: #1e2329;
+            --bg-tertiary: #2b3139;
+            --bg-card: #181a20;
+            --accent-gold: #f0b90b;
+            --accent-green: #0ecb81;
+            --accent-red: #f6465d;
+            --accent-blue: #1e80ff;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --text-muted: #5e6673;
+            --border-color: #2b3139;
+            --glow-gold: rgba(240, 185, 11, 0.3);
+            --glow-green: rgba(14, 203, 129, 0.3);
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(240,185,11,0.03) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(240,185,11,0.03) 100%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(240,185,11,0.08) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-gold), #d4a00a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--bg-primary);
+            font-weight: 800;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-gold);
+            background: rgba(240, 185, 11, 0.1);
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== BALANCE CARD ===== */
+        .balance-card {
+            background: linear-gradient(135deg, var(--bg-card) 0%, rgba(240,185,11,0.05) 100%);
+            border: 1px solid rgba(240,185,11,0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .balance-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-gold), #fcd535);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* ===== WITHDRAWAL FORM ===== */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .form-label .required {
+            color: var(--accent-red);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px var(--glow-gold);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23848e9c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .form-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Quick Amount Buttons */
+        .quick-amounts {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .quick-btn {
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 500;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            border-color: var(--accent-gold);
+            background: rgba(240, 185, 11, 0.1);
+            color: var(--accent-gold);
+        }
+
+        .quick-btn.max {
+            background: rgba(240, 185, 11, 0.15);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        /* Wallet Address Validation */
+        .wallet-validation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .wallet-validation.valid {
+            background: rgba(14, 203, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(14, 203, 129, 0.3);
+        }
+
+        .wallet-validation.invalid {
+            background: rgba(246, 70, 93, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(246, 70, 93, 0.3);
+        }
+
+        .wallet-validation.pending {
+            background: rgba(240, 185, 11, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(240, 185, 11, 0.3);
+        }
+
+        .validation-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Network Fee */
+        .fee-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .fee-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .fee-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-gold), #d4a00a);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-primary);
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--glow-gold);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Messages */
+        .message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(14, 203, 129, 0.1);
+            border: 1px solid rgba(14, 203, 129, 0.3);
+            color: var(--accent-green);
+        }
+
+        .message.error {
+            background: rgba(246, 70, 93, 0.1);
+            border: 1px solid rgba(246, 70, 93, 0.3);
+            color: var(--accent-red);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Security Notice */
+        .security-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(30, 128, 255, 0.1);
+            border: 1px solid rgba(30, 128, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+
+        .security-notice .icon {
+            font-size: 1.2rem;
+        }
+
+        .security-notice p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 14, 17, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .processing-overlay.show {
+            display: flex;
+        }
+
+        .processing-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .processing-subtext {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== RESPONSIVE STYLES ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .navbar-right .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .main-container {
+                padding: 20px 16px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .page-header p {
+                font-size: 0.85rem;
+            }
+            
+            .balance-card {
+                padding: 20px;
+            }
+            
+            .balance-amount {
+                font-size: 2rem;
+            }
+            
+            .balance-label, .balance-usd {
+                font-size: 0.8rem;
+            }
+            
+            .form-card {
+                padding: 20px 16px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-label {
+                font-size: 0.85rem;
+            }
+            
+            .form-input, .form-select {
+                padding: 12px 14px;
+                font-size: 0.95rem;
+            }
+            
+            .quick-amounts {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .quick-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .wallet-validation {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .submit-btn {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+            
+            .info-notice {
+                padding: 14px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .info-notice .icon {
+                font-size: 1rem;
+            }
+            
+            .info-notice p {
+                font-size: 0.8rem;
+            }
+            
+            .processing-text {
+                font-size: 1rem;
+            }
+            
+            .processing-subtext {
+                font-size: 0.85rem;
+            }
+            
+            .spinner {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                height: 52px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+                gap: 8px;
+            }
+            
+            .logo-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-right .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .main-container {
+                padding: 16px 12px;
+            }
+            
+            .page-header {
+                margin-bottom: 24px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .balance-card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+            
+            .balance-amount {
+                font-size: 1.7rem;
+            }
+            
+            .form-card {
+                padding: 16px 14px;
+            }
+            
+            .form-input, .form-select {
+                padding: 11px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .quick-amounts {
+                gap: 6px;
+            }
+            
+            .quick-btn {
+                padding: 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <a href="dashboard.html" class="logo">
+            <div class="logo-icon">₿</div>
+            CryptoVault
+        </a>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="deposit.html" class="nav-link">Deposit</a>
+            <a href="withdrawal.html" class="nav-link active">Withdraw</a>
+            <a href="#" class="nav-link">Markets</a>
+        </div>
+
+        <div class="navbar-right">
+            <a href="dashboard.html" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1>💸 Withdraw Funds</h1>
+            <p>Securely withdraw to your crypto wallet</p>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-card">
+            <div class="balance-label">Available Balance</div>
+            <div class="balance-value" id="availableBalance">$0.00</div>
+        </div>
+
+        <!-- Withdrawal Form -->
+        <div class="form-card">
+            <form id="withdrawalForm">
+                <!-- Crypto Selection -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Select Cryptocurrency <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="cryptoType" required>
+                        <option value="">Choose cryptocurrency</option>
+                        <option value="BTC">Bitcoin (BTC)</option>
+                        <option value="ETH">Ethereum (ETH)</option>
+                        <option value="USDT">Tether (USDT - ERC20)</option>
+                        <option value="USDC">USD Coin (USDC)</option>
+                        <option value="LTC">Litecoin (LTC)</option>
+                        <option value="BNB">BNB (BSC)</option>
+                        <option value="SOL">Solana (SOL)</option>
+                        <option value="XRP">XRP (Ripple)</option>
+                    </select>
+                </div>
+
+                <!-- Wallet Address -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Wallet Address <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" class="form-input" id="walletAddress" 
+                               placeholder="Enter your wallet address" required>
+                    </div>
+                    <div class="wallet-validation" id="walletValidation" style="display: none;">
+                        <span class="validation-icon" id="validationIcon">⏳</span>
+                        <span id="validationText">Validating address format...</span>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Amount (USD) <span class="required">*</span>
+                    </label>
+                    <input type="number" class="form-input" id="withdrawAmount" 
+                           placeholder="Enter amount" min="10" step="0.01" required>
+                    
+                    <div class="quick-amounts">
+                        <button type="button" class="quick-btn" onclick="setAmount(50)">$50</button>
+                        <button type="button" class="quick-btn" onclick="setAmount(100)">$100</button>
+                        <button type="button" class="quick-btn" onclick="setAmount(500)">$500</button>
+                        <button type="button" class="quick-btn max" onclick="setMaxAmount()">MAX</button>
+                    </div>
+
+                    <div class="fee-info">
+                        <span class="fee-label">Network Fee</span>
+                        <span class="fee-value" id="networkFee">~$2.50</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Confirm Withdrawal
+                </button>
+
+                <!-- Message -->
+                <div class="message" id="message"></div>
+            </form>
+
+            <!-- Security Notice -->
+            <div class="security-notice">
+                <span class="icon">🔐</span>
+                <p>
+                    <strong>Security Notice:</strong> Always double-check your wallet address before confirming. 
+                    Transactions on the blockchain are irreversible. Withdrawals are processed within 24 hours.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <div class="processing-text">Processing Withdrawal</div>
+            <div class="processing-subtext">Please wait while we verify your transaction...</div>
+        </div>
+    </div>
+
+<script type="module" src="js/withdrawal.js"></script>
+</body>
+</html>

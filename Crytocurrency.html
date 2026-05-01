@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Deposit - CryptoVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-secondary: #1e2329;
+            --bg-tertiary: #2b3139;
+            --bg-card: #181a20;
+            --accent-gold: #f0b90b;
+            --accent-green: #0ecb81;
+            --accent-red: #f6465d;
+            --accent-blue: #1e80ff;
+            --text-primary: #eaecef;
+            --text-secondary: #848e9c;
+            --text-muted: #5e6673;
+            --border-color: #2b3139;
+            --glow-gold: rgba(240, 185, 11, 0.3);
+            --glow-green: rgba(14, 203, 129, 0.3);
+        }
+
+        html, body {
+            height: 100%;
+            background: var(--bg-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 98%, rgba(240,185,11,0.03) 100%),
+                linear-gradient(0deg, transparent 98%, rgba(240,185,11,0.03) 100%);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: -200px;
+            right: -200px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(14,203,129,0.1) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            height: 64px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-gold), #d4a00a);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: var(--bg-primary);
+            font-weight: 800;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .nav-link.active {
+            color: var(--accent-gold);
+            background: rgba(240, 185, 11, 0.1);
+        }
+
+        .navbar-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* ===== DEPOSIT FORM ===== */
+        .form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .form-label .required {
+            color: var(--accent-red);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px var(--glow-gold);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23848e9c' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .form-select option {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Website Wallet Box */
+        .wallet-box {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, rgba(240,185,11,0.05) 100%);
+            border: 1px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+            display: none;
+        }
+
+        .wallet-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .wallet-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .wallet-box-header span {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .wallet-address {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-gold);
+            border: none;
+            border-radius: 8px;
+            color: var(--bg-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #d4a00a;
+        }
+
+        /* Wallet Validation */
+        .wallet-validation {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .wallet-validation.valid {
+            background: rgba(14, 203, 129, 0.1);
+            color: var(--accent-green);
+            border: 1px solid rgba(14, 203, 129, 0.3);
+        }
+
+        .wallet-validation.invalid {
+            background: rgba(246, 70, 93, 0.1);
+            color: var(--accent-red);
+            border: 1px solid rgba(246, 70, 93, 0.3);
+        }
+
+        .wallet-validation.pending {
+            background: rgba(240, 185, 11, 0.1);
+            color: var(--accent-gold);
+            border: 1px solid rgba(240, 185, 11, 0.3);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent-green), #0a9e66);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--glow-green);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Message */
+        .message {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.success {
+            background: rgba(14, 203, 129, 0.1);
+            border: 1px solid rgba(14, 203, 129, 0.3);
+            color: var(--accent-green);
+        }
+
+        .message.error {
+            background: rgba(246, 70, 93, 0.1);
+            border: 1px solid rgba(246, 70, 93, 0.3);
+            color: var(--accent-red);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Info Notice */
+        .info-notice {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(30, 128, 255, 0.1);
+            border: 1px solid rgba(30, 128, 255, 0.2);
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+
+        .info-notice .icon {
+            font-size: 1.2rem;
+        }
+
+        .info-notice p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 14, 17, 0.95);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .processing-overlay.show {
+            display: flex;
+        }
+
+        .processing-content {
+            text-align: center;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-green);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 24px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .processing-subtext {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Success Screen */
+        .success-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            z-index: 2000;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .success-screen.show {
+            display: flex;
+        }
+
+        .success-content {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            margin: auto;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-green), #0a9e66);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 2.5rem;
+        }
+
+        .success-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 16px;
+            color: var(--accent-green);
+        }
+
+        .success-details {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            text-align: left;
+        }
+
+        .success-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .success-row:last-child {
+            border-bottom: none;
+        }
+
+        .success-row .label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .success-row .value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            word-break: break-all;
+            text-align: right;
+            max-width: 60%;
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .success-actions .btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            border: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        /* ===== RESPONSIVE STYLES ===== */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 0.95rem;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+            
+            .navbar-right .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .main-container {
+                padding: 20px 16px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .page-header p {
+                font-size: 0.85rem;
+            }
+            
+            .form-card {
+                padding: 20px 16px;
+                border-radius: 12px;
+            }
+            
+            .form-group {
+                margin-bottom: 20px;
+            }
+            
+            .form-label {
+                font-size: 0.85rem;
+            }
+            
+            .form-input, .form-select {
+                padding: 12px 14px;
+                font-size: 0.95rem;
+            }
+            
+            .wallet-box {
+                padding: 16px;
+            }
+            
+            .wallet-box-header span {
+                font-size: 0.8rem;
+            }
+            
+            .wallet-address {
+                padding: 12px;
+                font-size: 0.75rem;
+            }
+            
+            .copy-btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+            
+            .wallet-validation {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .submit-btn {
+                padding: 14px;
+                font-size: 0.95rem;
+            }
+            
+            .info-notice {
+                padding: 14px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .info-notice .icon {
+                font-size: 1rem;
+            }
+            
+            .info-notice p {
+                font-size: 0.8rem;
+            }
+            
+            .success-screen {
+                padding: 16px;
+                align-items: flex-start;
+            }
+            
+            .success-content {
+                padding: 10px 0 30px;
+            }
+            
+            .success-content h2 {
+                font-size: 1.4rem;
+                margin-bottom: 8px;
+            }
+            
+            .success-content > p {
+                font-size: 0.85rem;
+                margin-bottom: 16px;
+            }
+            
+            .success-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 1.8rem;
+                margin-bottom: 16px;
+            }
+            
+            .success-details {
+                padding: 12px;
+                margin: 16px 0;
+            }
+            
+            .success-row {
+                flex-direction: column;
+                gap: 2px;
+                padding: 8px 0;
+            }
+            
+            .success-row .value {
+                max-width: 100%;
+                text-align: left;
+                font-size: 0.8rem;
+                word-break: break-all;
+            }
+            
+            .success-row .label {
+                font-size: 0.75rem;
+            }
+            
+            .success-actions {
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 16px;
+            }
+            
+            .success-actions .btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .processing-text {
+                font-size: 1rem;
+            }
+            
+            .processing-subtext {
+                font-size: 0.85rem;
+            }
+            
+            .spinner {
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .navbar {
+                height: 52px;
+            }
+            
+            .logo {
+                font-size: 1.1rem;
+                gap: 8px;
+            }
+            
+            .logo-icon {
+                width: 26px;
+                height: 26px;
+                font-size: 0.9rem;
+            }
+            
+            .navbar-right .btn {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+            }
+            
+            .main-container {
+                padding: 16px 12px;
+            }
+            
+            .page-header {
+                margin-bottom: 24px;
+            }
+            
+            .page-header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .form-card {
+                padding: 16px 14px;
+            }
+            
+            .form-input, .form-select {
+                padding: 11px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .wallet-address {
+                font-size: 0.7rem;
+                padding: 10px;
+            }
+            
+            .success-screen {
+                padding: 12px;
+            }
+            
+            .success-content {
+                padding: 8px 0 24px;
+            }
+            
+            .success-content h2 {
+                font-size: 1.2rem;
+            }
+            
+            .success-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 1.5rem;
+                margin-bottom: 12px;
+            }
+            
+            .success-details {
+                padding: 10px;
+                margin: 12px 0;
+            }
+            
+            .success-row {
+                padding: 6px 0;
+            }
+            
+            .success-row .value {
+                font-size: 0.75rem;
+            }
+            
+            .success-row .label {
+                font-size: 0.7rem;
+            }
+            
+            .success-actions .btn {
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <a href="dashboard.html" class="logo">
+            <div class="logo-icon">₿</div>
+            CryptoVault
+        </a>
+        
+        <div class="nav-menu">
+            <a href="dashboard.html" class="nav-link">Dashboard</a>
+            <a href="deposit.html" class="nav-link active">Deposit</a>
+            <a href="withdrawal.html" class="nav-link">Withdraw</a>
+            <a href="#" class="nav-link">Markets</a>
+        </div>
+
+        <div class="navbar-right">
+            <a href="deposit.html" class="btn btn-outline">← Back to Deposit</a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1>₿ Crypto Deposit</h1>
+            <p>Deposit cryptocurrency directly from your wallet</p>
+        </div>
+
+        <!-- Deposit Form -->
+        <div class="form-card">
+            <form id="cryptoForm" onsubmit="handleCryptoDeposit(event)">
+                <!-- Crypto Selection -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Select Cryptocurrency <span class="required">*</span>
+                    </label>
+                    <select class="form-select" id="cryptoType" onchange="updateWebsiteWallet()" required>
+                        <option value="">Choose cryptocurrency</option>
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="litecoin">Litecoin (LTC)</option>
+                        <option value="ripple">XRP (Ripple)</option>
+                        <option value="solana">Solana (SOL)</option>
+                        <option value="cardano">Cardano (ADA)</option>
+                        <option value="polkadot">Polkadot (DOT)</option>
+                        <option value="dogecoin">Dogecoin (DOGE)</option>
+                    </select>
+
+                    <!-- Website Wallet Address -->
+                    <div class="wallet-box" id="websiteWalletBox">
+                        <div class="wallet-box-header">
+                            <span>📥 Send to this wallet address:</span>
+                        </div>
+                        <div class="wallet-address" id="websiteWalletAddress">--</div>
+                        <button type="button" class="copy-btn" onclick="copyWalletAddress()">
+                            📋 Copy Address
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Amount (USD) <span class="required">*</span>
+                    </label>
+                    <input type="number" class="form-input" id="cryptoAmount" 
+                           placeholder="Enter amount in USD" min="10" step="0.01" required>
+                </div>
+
+                <!-- Your Wallet Address -->
+                <div class="form-group">
+                    <label class="form-label">
+                        Your Wallet Address <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-input" id="walletAddress" 
+                           placeholder="Enter your sending wallet address" required>
+                    <div class="wallet-validation" id="walletValidation" style="display: none;">
+                        <span id="validationIcon">⏳</span>
+                        <span id="validationText">Validating address format...</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Submit & Deposit Funds
+                </button>
+
+                <!-- Message -->
+                <div class="message" id="message"></div>
+            </form>
+
+            <!-- Info Notice -->
+            <div class="info-notice">
+                <span class="icon">ℹ️</span>
+                <p>
+                    Send cryptocurrency to the wallet address shown above, then submit this form to confirm your deposit. 
+                    Deposits are typically credited within 10-30 minutes after blockchain confirmation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingScreen">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <div class="processing-text">Processing Deposit</div>
+            <div class="processing-subtext">Verifying blockchain transaction...</div>
+        </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div class="success-screen" id="successScreen">
+        <div class="success-content">
+            <div class="success-icon">✓</div>
+            <h2>Deposit Successful!</h2>
+            <p style="color: var(--text-secondary);">Your funds have been added to your account</p>
+            
+            <div class="success-details">
+                <div class="success-row">
+                    <span class="label">Cryptocurrency</span>
+                    <span class="value" id="successCryptoType">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">Amount</span>
+                    <span class="value" id="successAmount">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">Transaction ID</span>
+                    <span class="value" id="transactionId">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">From Wallet</span>
+                    <span class="value" id="successFromWallet">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">To Wallet</span>
+                    <span class="value" id="successToWallet">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">Time</span>
+                    <span class="value" id="successTime">-</span>
+                </div>
+                <div class="success-row">
+                    <span class="label">Previous Balance</span>
+                    <span class="value">$<span id="oldBalance">0.00</span></span>
+                </div>
+                <div class="success-row">
+                    <span class="label">New Balance</span>
+                    <span class="value" style="color: var(--accent-green);">$<span id="newBalance">0.00</span></span>
+                </div>
+            </div>
+
+            <div class="success-actions">
+                <a href="dashboard.html" class="btn btn-primary">
+                    📊 Go to Dashboard
+                </a>
+                <a href="Crytocurrency.html" class="btn btn-secondary">
+                    ➕ Make Another Deposit
+                </a>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDBtM_t1l2wd_BHwbtUWa37HogdDgQew9I",
+  authDomain: "mine-project-daea5.firebaseapp.com",
+  projectId: "mine-project-daea5",
+  storageBucket: "mine-project-daea5.firebasestorage.app",
+  messagingSenderId: "677923336045",
+  appId: "1:677923336045:web:bfdab8d21f00f569ff7464",
+  measurementId: "G-5WCEHSZEV5"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+// Website wallet addresses
+const websiteWallets = {
+  bitcoin: "1A1z7agoat3vTgGKjzCvCc8ksFzEJzC6TN",
+  ethereum: "0x742d35Cc6634C0532925a3b844Bc9e7595f4bEb2",
+  litecoin: "LgGxuHjJBqeqjFrVrczXkkV1rWiQZwwWgP",
+  ripple: "rN7n7otQDd6FczFgLdhmKAh4RNrYKKiVJC",
+  cardano: "addr1qx5r2wqnkf3n0gvnqdq4l8yl0z7l8p5k3n0z7p2f5q4r3s2t1",
+  solana: "9B5X4z3vYaGx9Zt6pQwJ8kL4nQ3mR5sT2yU1vW0xM9",
+  polkadot: "1ZiETiM6m3eZpq2rS6e9qL8L1L9L8M7M6M5L4K3J2",
+  dogecoin: "DPaHvbH5V4d7r9t6r4v2p9m8n1j3k5l7q2s4u6w8y"
+};
+
+const cryptoNames = {
+  bitcoin: "Bitcoin",
+  ethereum: "Ethereum",
+  litecoin: "Litecoin",
+  ripple: "XRP",
+  cardano: "Cardano",
+  solana: "Solana",
+  polkadot: "Polkadot",
+  dogecoin: "Dogecoin"
+};
+
+// Wallet validation patterns
+const walletPatterns = {
+  bitcoin: [/^1[a-km-zA-HJ-NP-Z1-9]{25,34}$/, /^3[a-km-zA-HJ-NP-Z1-9]{25,34}$/, /^bc1[a-z0-9]{39,59}$/],
+  ethereum: [/^0x[a-fA-F0-9]{40}$/],
+  litecoin: [/^[LM][a-km-zA-HJ-NP-Z1-9]{26,33}$/, /^ltc1[a-z0-9]{39,59}$/],
+  ripple: [/^r[1-9A-HJ-NP-Za-km-z]{24,34}$/],
+  cardano: [/^addr1[a-z0-9]{58,98}$/],
+  solana: [/^[1-9A-HJ-NP-Za-km-z]{32,44}$/],
+  polkadot: [/^1[a-zA-Z0-9]{30,50}$/],
+  dogecoin: [/^D[5-9A-HJ-NP-U][a-km-zA-HJ-NP-Z1-9]{24,33}$/]
+};
+
+// Check if user is logged in
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = 'index.html';
+  } else {
+    currentUser = user;
+    console.log("✅ User logged in:", user.email);
+  }
+});
+
+// Show website wallet address
+window.updateWebsiteWallet = function() {
+  const cryptoType = document.getElementById("cryptoType").value;
+  const websiteWalletBox = document.getElementById("websiteWalletBox");
+  const websiteWalletAddress = document.getElementById("websiteWalletAddress");
+
+  if (cryptoType && websiteWallets[cryptoType]) {
+    websiteWalletAddress.textContent = websiteWallets[cryptoType];
+    websiteWalletBox.classList.add('show');
+  } else {
+    websiteWalletBox.classList.remove('show');
+  }
+  
+  // Re-validate wallet if address exists
+  const address = document.getElementById("walletAddress").value.trim();
+  if (address.length > 10 && cryptoType) {
+    validateAndShowResult(address, cryptoType);
+  }
+};
+
+// Copy wallet address
+window.copyWalletAddress = function() {
+  const walletAddress = document.getElementById("websiteWalletAddress").textContent;
+  if (walletAddress === "--") {
+    showMessage("⚠️ Please select a cryptocurrency first", "error");
+    return;
+  }
+  navigator.clipboard.writeText(walletAddress).then(() => {
+    showMessage("✅ Wallet address copied!", "success");
+  });
+};
+
+// Validate wallet address
+function validateWalletAddress(address, cryptoType) {
+  if (!address || !cryptoType) return { valid: false, message: "Select crypto and enter address" };
+  const patterns = walletPatterns[cryptoType];
+  if (!patterns) return { valid: false, message: "Unknown cryptocurrency" };
+  const isValid = patterns.some(p => p.test(address));
+  return isValid 
+    ? { valid: true, message: `✓ Valid ${cryptoNames[cryptoType]} address` }
+    : { valid: false, message: `Invalid ${cryptoNames[cryptoType]} address format` };
+}
+
+function validateAndShowResult(address, cryptoType) {
+  const result = validateWalletAddress(address, cryptoType);
+  const validationEl = document.getElementById('walletValidation');
+  const iconEl = document.getElementById('validationIcon');
+  const textEl = document.getElementById('validationText');
+  
+  validationEl.style.display = 'flex';
+  validationEl.className = result.valid ? 'wallet-validation valid' : 'wallet-validation invalid';
+  iconEl.textContent = result.valid ? '✓' : '✗';
+  textEl.textContent = result.message;
+}
+
+// Wallet input validation
+document.getElementById('walletAddress').addEventListener('input', function() {
+  const address = this.value.trim();
+  const cryptoType = document.getElementById('cryptoType').value;
+  if (address.length > 10 && cryptoType) {
+    validateAndShowResult(address, cryptoType);
+  } else if (address.length > 0) {
+    document.getElementById('walletValidation').style.display = 'flex';
+    document.getElementById('walletValidation').className = 'wallet-validation pending';
+    document.getElementById('validationIcon').textContent = '⏳';
+    document.getElementById('validationText').textContent = 'Enter complete address';
+  } else {
+    document.getElementById('walletValidation').style.display = 'none';
+  }
+});
+
+// Handle crypto deposit
+window.handleCryptoDeposit = async function(event) {
+  event.preventDefault();
+
+  if (!currentUser) {
+    showMessage("❌ Please login first!", "error");
+    return;
+  }
+
+  const cryptoType = document.getElementById("cryptoType").value;
+  const amount = parseFloat(document.getElementById("cryptoAmount").value);
+  const walletAddress = document.getElementById("walletAddress").value.trim();
+  const submitBtn = document.getElementById("submitBtn");
+
+  // Validation
+  if (!cryptoType) {
+    showMessage("⚠️ Please select a cryptocurrency", "error");
+    return;
+  }
+
+  if (isNaN(amount) || amount < 10) {
+    showMessage("⚠️ Minimum deposit is $10 USD", "error");
+    return;
+  }
+
+  if (!walletAddress || walletAddress.length < 20) {
+    showMessage("⚠️ Please enter a valid wallet address", "error");
+    return;
+  }
+
+  const validation = validateWalletAddress(walletAddress, cryptoType);
+  if (!validation.valid) {
+    showMessage(`❌ ${validation.message}`, "error");
+    return;
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Processing...";
+
+  try {
+    // Show processing screen
+    document.getElementById("cryptoForm").style.display = "none";
+    document.getElementById("message").style.display = "none";
+    document.getElementById("processingScreen").classList.add("show");
+
+    const userDocRef = doc(db, "users", currentUser.uid);
+    const userDocBefore = await getDoc(userDocRef);
+    
+    if (!userDocBefore.exists()) {
+      throw new Error("User document not found. Please logout and login again.");
+    }
+
+    const oldBalance = userDocBefore.data().balance || 0;
+    const transactionId = "TX" + Date.now() + Math.random().toString(36).substr(2, 9).toUpperCase();
+
+    console.log(`\n📝 === CRYPTO DEPOSIT START ===`);
+    console.log(`   User: ${currentUser.email}`);
+    console.log(`   Crypto: ${cryptoNames[cryptoType]}`);
+    console.log(`   Old Balance: $${oldBalance.toFixed(2)}`);
+    console.log(`   Amount: $${amount.toFixed(2)}`);
+
+    // Simulate blockchain verification
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    // Update Firestore
+    await updateDoc(userDocRef, {
+      balance: increment(amount),
+      lastCryptoDeposit: {
+        type: cryptoType,
+        amount: amount,
+        walletAddress: walletAddress,
+        timestamp: new Date().toISOString(),
+        transactionId: transactionId,
+        status: "completed"
+      },
+      depositHistory: arrayUnion({
+        transactionId: transactionId,
+        type: cryptoType,
+        amount: amount,
+        walletAddress: walletAddress,
+        timestamp: new Date().toISOString(),
+        status: "completed"
+      }),
+      lastTransactionTime: new Date().toISOString()
+    });
+
+    console.log(`✅ Firestore updated!`);
+
+    // Get updated balance with retry
+    let retries = 5;
+    let newBalance = oldBalance;
+    
+    while (retries > 0) {
+      const userDocAfter = await getDoc(userDocRef);
+      newBalance = userDocAfter.exists() ? (userDocAfter.data().balance || 0) : 0;
+      if (newBalance > oldBalance) break;
+      retries--;
+      if (retries > 0) await new Promise(r => setTimeout(r, 500));
+    }
+
+    console.log(`   New Balance: $${newBalance.toFixed(2)}`);
+    console.log(`📝 === DEPOSIT COMPLETE ===\n`);
+
+    // Show success screen
+    document.getElementById("successCryptoType").textContent = cryptoNames[cryptoType];
+    document.getElementById("successAmount").textContent = `$${amount.toFixed(2)} USD`;
+    document.getElementById("transactionId").textContent = transactionId;
+    document.getElementById("successFromWallet").textContent = walletAddress;
+    document.getElementById("successToWallet").textContent = websiteWallets[cryptoType];
+    document.getElementById("successTime").textContent = new Date().toLocaleString();
+    document.getElementById("oldBalance").textContent = oldBalance.toFixed(2);
+    document.getElementById("newBalance").textContent = newBalance.toFixed(2);
+
+    document.getElementById("processingScreen").classList.remove("show");
+    document.getElementById("successScreen").classList.add("show");
+
+  } catch (error) {
+    console.error("❌ Deposit error:", error);
+    document.getElementById("processingScreen").classList.remove("show");
+    document.getElementById("cryptoForm").style.display = "block";
+    
+    let errorMsg = error.message;
+    if (error.code === 'permission-denied') {
+      errorMsg = "Permission denied. Check Firestore rules.";
+    }
+    
+    showMessage(`❌ Deposit failed: ${errorMsg}`, "error");
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Submit & Deposit Funds";
+  }
+};
+
+function showMessage(text, type = 'success') {
+  const messageEl = document.getElementById("message");
+  messageEl.innerText = text;
+  messageEl.className = `message show ${type}`;
+  setTimeout(() => messageEl.classList.remove('show'), 5000);
+}
+</script>
+</body>
+</html>
